@@ -1,6 +1,14 @@
+from numpy import asanyarray
+
 from .settings import continuous_palette, discrete_palette
 from .utils import AxesUpdater, DataContainer
 
+
+def validate_raster(raster):
+    raster = asanyarray(raster)
+    if raster.ndim > 2:
+        raise ValueError("Only 2-dim rasters are supported")
+    return raster
 
 def raster_cont(data, ax=None, palette=continuous_palette, lower=None, upper=None, **kwargs):  # noqa
     """Plot a raster with continuous values.
@@ -29,9 +37,7 @@ def raster_cont(data, ax=None, palette=continuous_palette, lower=None, upper=Non
     matplotlib Axes
     """
 
-    if data.ndim > 2:
-        raise ValueError("Only 2-dim rasters are supported")
-
+    data = validate_raster(data)
     container = DataContainer.from_continuous(
         data,
         palette,
@@ -65,9 +71,7 @@ def raster_discrete(data, ax=None, palette=discrete_palette, **kwargs):
     matplotlib Axes
     """
 
-    if data.ndim > 2:
-        raise ValueError("Only 2-dim rasters are supported")
-
+    data = validate_raster(data)
     container = DataContainer.from_discrete(data, palette)
     updater = AxesUpdater.from_discrete(container, ax=ax, **kwargs)
     collection = updater.add_raster()

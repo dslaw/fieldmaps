@@ -1,8 +1,18 @@
 """Scatterplot maps."""
 
+from numpy import asanyarray
+
 from .settings import continuous_palette, discrete_palette
 from .utils import AxesUpdater, DataContainer
 
+
+def validate_coords(coords):
+    coords = asanyarray(coords)
+    if coords.ndim != 2:
+        raise ValueError("`coords` must be a 2-dim array")
+    if coords.shape[1] != 2:
+        raise ValueError("`coords` must be an array of shape (n, 2)")
+    return coords
 
 def point_cont(data, coords, ax=None, palette=continuous_palette, lower=None, upper=None, **kwargs):  # noqa
     """Plot a scatterplot map with continuous values.
@@ -34,11 +44,7 @@ def point_cont(data, coords, ax=None, palette=continuous_palette, lower=None, up
     matplotlib Axes
     """
 
-    if coords.ndim != 2:
-        raise ValueError("`coords` must be a 2-dim array")
-    if coords.shape[1] != 2:
-        raise ValueError("`coords` must be an array of shape (n, 2)")
-
+    coords = validate_coords(coords)
     container = DataContainer.from_continuous(
         data,
         palette,
@@ -75,11 +81,7 @@ def point_discrete(data, coords, ax=None, palette=discrete_palette, **kwargs):
     matplotlib Axes
     """
 
-    if coords.ndim != 2:
-        raise ValueError("`coords` must be a 2-dim array")
-    if coords.shape[1] != 2:
-        raise ValueError("`coords` must be an array of shape (n, 2)")
-
+    coords = validate_coords(coords)
     container = DataContainer.from_discrete(data, palette)
     updater = AxesUpdater.from_discrete(container, ax=ax, **kwargs)
     collection = updater.add_points(coords)
